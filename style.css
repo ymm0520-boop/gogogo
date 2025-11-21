@@ -1,0 +1,270 @@
+/* 基础样式 */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Noto Serif SC", "SimSun", "Times New Roman", serif;
+    background: #001630;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+/* 页面布局 */
+.page-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+
+.content {
+    flex: 3;
+    padding: 30px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.sidebar {
+    flex: 1;
+    background: #002950;
+    padding: 20px;
+    border-left: 3px solid #003a70;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 页面控制 */
+.page { 
+    display: none; 
+    height: 100vh;
+    overflow: hidden;
+}
+
+.active { 
+    display: flex; 
+}
+
+/* 文字样式 */
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #c4a46a;
+}
+
+.desc {
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.letter {
+    font-family: "Times New Roman", serif;
+    background: rgba(255,255,255,0.1);
+    border-left: 5px solid #c4a46a;
+    padding: 15px;
+    margin: 20px 0;
+    white-space: pre-wrap;
+    line-height: 1.8;
+}
+
+/* 表单元素 */
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: none;
+    font-family: "Noto Serif SC", serif;
+    background: rgba(255,255,255,0.9);
+    color: #001630;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    background: #0055aa;
+    color: white;
+    border: none;
+    font-family: "Noto Serif SC", serif;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #0066cc;
+}
+
+/* 表格样式 */
+table.flag-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: rgba(255,255,255,0.05);
+}
+
+table.flag-table th, 
+table.flag-table td {
+    border: 1px solid #c4a46a;
+    padding: 8px 12px;
+    text-align: center;
+}
+
+table.flag-table th {
+    background: rgba(196, 164, 106, 0.2);
+    color: #c4a46a;
+}
+
+table.flag-table .desc {
+    text-align: left;
+}
+
+/* 特殊组件 */
+.search-history {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.search-history h4 {
+    margin: 0 0 10px 0;
+    color: #c4a46a;
+}
+
+.search-history-item {
+    background: rgba(255,255,255,0.05);
+    padding: 5px 8px;
+    margin: 3px 0;
+    border-radius: 4px;
+    font-size: 14px;
+    border-left: 2px solid #c4a46a;
+}
+
+.unlock-section {
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 30px 0;
+    border-left: 4px solid #c4a46a;
+}
+
+.success-badge {
+    background: #103228;
+    color: #cfead7;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    text-align: center;
+    border: 2px solid #c4a46a;
+}
+
+.second-act-btn {
+    background: #c4a46a !important;
+    color: #001630 !important;
+    font-weight: bold !important;
+    padding: 12px 24px !important;
+    font-size: 18px !important;
+    margin: 20px auto !important;
+    display: block !important;
+    width: auto !important;
+}
+
+.second-act-btn:hover {
+    background: #d4b47a !important;
+}
+
+/* 页面链接 */
+.page-link {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    border-left: 4px solid #0055aa;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background: rgba(255,255,255,0.1);
+    border-left-color: #c4a46a;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .page-wrapper {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .sidebar {
+        border-left: none;
+        border-top: 3px solid #003a70;
+        min-width: auto;
+    }
+    
+    .content {
+        padding: 20px;
+    }
+}
+
+/* 图片样式 */
+.story-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 2px solid #c4a46a;
+}
+
+.character-portrait {
+    width: 150px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    float: left;
+    margin: 0 15px 15px 0;
+}
+
+.map-image {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    display: block;
+    margin: 15px auto;
+    border: 3px solid #c4a46a;
+}
+
+/* 提示文字 */
+.hint-text {
+    color: #c4a46a;
+    font-style: italic;
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(196, 164, 106, 0.1);
+    border-radius: 4px;
+}
+
+/* 重要内容高亮 */
+.important {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+/* 导航提示 */
+.navigation-hint {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 6px;
+    margin: 20px 0;
+    border-left: 4px solid #0055aa;
+}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>航海冒险 - 征召信</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 页面容器 -->
+    <div id="app">
+        <!-- 页面内容将通过JavaScript动态渲染 -->
+    </div>
+
+    <!-- 加载配置和引擎 -->
+    <script src="js/config.js"></script>
+    <script src="js/story-data.js"></script>
+    <script src="js/game-engine.js"></script>
+
+    <!-- 初始化游戏 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof GameEngine !== 'undefined') {
+                const game = new GameEngine();
+                game.init();
+            }
+        });
+    </script>
+</body>
+</html>
