@@ -10,6 +10,73 @@ class GameEngine {
         this.initializeSearchHistories();
     }
 
+    // 初始化游戏
+    init() {
+        this.renderAllPages();
+        this.initEventListeners();
+        this.navigateTo('/official_draft'); // 默认显示第一页
+        console.log('游戏引擎初始化完成');
+    }
+
+    // 渲染所有页面
+    renderAllPages() {
+        const app = document.getElementById('app');
+        if (!app) {
+            console.error('找不到app容器');
+            return;
+        }
+
+        app.innerHTML = '';
+
+        // 渲染所有页面
+        Object.keys(STORY_DATA.act1).forEach(pageId => {
+            this.renderPage(app, pageId, STORY_DATA.act1);
+        });
+
+        Object.keys(STORY_DATA.act2).forEach(pageId => {
+            this.renderPage(app, pageId, STORY_DATA.act2);
+        });
+
+        console.log('所有页面渲染完成');
+    }
+
+    // 渲染单个页面
+    renderPage(container, pageId, storyData) {
+        const pageData = storyData[pageId];
+        if (!pageData) return;
+
+        const page = document.createElement('div');
+        page.className = 'page';
+        page.id = pageId;
+
+        const pageContent = `
+            <div class="page-wrapper">
+                <div class="content">
+                    <div class="title">${pageData.title}</div>
+                    <div class="story-content">${pageData.content}</div>
+                    ${this.renderSearchInput(pageId)}
+                </div>
+                <div class="sidebar">
+                    <div class="search-history" id="history_${pageId.replace('/', '')}"></div>
+                </div>
+            </div>
+        `;
+
+        page.innerHTML = pageContent;
+        container.appendChild(page);
+    }
+
+    // 渲染搜索输入框
+    renderSearchInput(pageId) {
+        const inputId = `search_${pageId.replace('/', '')}`;
+        return `
+            <div style="margin-top: 20px;">
+                <input type="text" id="${inputId}" placeholder="输入关键词..." style="width: 100%; padding: 10px; font-size: 16px;">
+                <button onclick="game.handleSearch('${pageId}', '${inputId}')" style="width: 100%; padding: 10px; margin-top: 10px;">搜索</button>
+            </div>
+        `;
+    }
+
     // 新增：初始化所有页面的搜索历史
     initializeSearchHistories() {
         // 为所有已知页面初始化空的搜索历史数组
