@@ -19,13 +19,14 @@
     <script src="game-engine.js"></script>
 
     <!-- 初始化游戏 -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof GameEngine !== 'undefined') {
-                const game = new GameEngine();
-                game.init();
-            }
-        });
-    </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof GameEngine !== 'undefined' && typeof game !== 'undefined') {
+            game.init();
+        } else {
+            console.error('游戏引擎初始化失败');
+        }
+    });
+</script>
 </body>
 </html>
