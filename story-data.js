@@ -211,15 +211,15 @@ const STORY_DATA = {
             title: '真相的拼图',
             content: `
                 <div class="desc">
-                    线索已经齐备。<br>
-                    艾登的旗语 (WNWL)，旧航图的首字母，以及那艘神秘的舰船。<br>
+                    线索还待齐备。<br>
+
                     命运的齿轮已经开始转动。
                 </div>
                 
                 <div class="unlock-section">
                     <div id="unlock-instruction">
                         <p style="color: #8b0000; font-weight:bold;">请输入最终的答案以开启航程。</p>
-                        <p style="font-size: 0.9em;">(提示：输入缩写 WNWL，或全称，或舰船名)</p>
+                        <p style="font-size: 0.9em;">(提示：输入目的地或舰船名)</p>
                     </div>
                     <input type="text" id="unlockInput" placeholder="输入答案...">
                     <button id="unlockButton" onclick="window.game.handleUnlock()">开启航程</button>
