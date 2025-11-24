@@ -253,7 +253,7 @@ const STORY_DATA = {
             `
         },
 
-
+    }, 
 
     act2: {
         '/ch2_intro': {
