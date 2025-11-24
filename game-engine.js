@@ -1,93 +1,173 @@
+/* --- START OF FILE game-engine.js --- */
+
 class GameEngine {
     constructor() {
         this.state = {
-            unlockEntryMethod: null,
+            unlockEntryMethod: null, // 'destination' or 'ship'
             discoveredPages: new Set(['/official_draft']),
-            searchHistories: {} // 初始化搜索历史
+            historyStack: [], // 导航历史栈
+            currentAct: 'act1',
+            currentPageId: null
         };
-        
-        // 初始化所有页面的搜索历史
-        this.initializeSearchHistories();
     }
 
     // 初始化游戏
     init() {
         this.renderAllPages();
-        this.initEventListeners();
-        this.navigateTo('/official_draft'); // 默认显示第一页
-        console.log('游戏引擎初始化完成');
+        this.initGlobalListeners();
+        this.navigateTo('/official_draft', false); // 初始加载不记入历史栈
+        console.log('航海冒险游戏初始化完成 - v2.0 Medieval');
     }
 
-    // 渲染所有页面
+    // 渲染所有页面结构 (现在分为左侧内容和右侧侧边栏)
     renderAllPages() {
         const app = document.getElementById('app');
-        if (!app) {
-            console.error('找不到app容器');
-            return;
-        }
+        let html = '';
 
-        app.innerHTML = '';
-
-        // 渲染所有页面
-        Object.keys(STORY_DATA.act1).forEach(pageId => {
-            this.renderPage(app, pageId, STORY_DATA.act1);
+        Object.keys(STORY_DATA).forEach(act => {
+            Object.entries(STORY_DATA[act]).forEach(([pageId, pageData]) => {
+                html += this.createPageLayout(pageId, pageData);
+            });
         });
 
-        Object.keys(STORY_DATA.act2).forEach(pageId => {
-            this.renderPage(app, pageId, STORY_DATA.act2);
-        });
-
-        console.log('所有页面渲染完成');
+        app.innerHTML = html;
+        this.updateAllSidebars(); // 初始渲染侧边栏
     }
 
-    // 渲染单个页面
-    renderPage(container, pageId, storyData) {
-        const pageData = storyData[pageId];
-        if (!pageData) return;
-
-        const page = document.createElement('div');
-        page.className = 'page';
-        page.id = pageId;
-
-        const pageContent = `
-            <div class="page-wrapper">
-                <div class="content">
-                    <div class="title">${pageData.title}</div>
-                    <div class="story-content">${pageData.content}</div>
-                    ${this.renderSearchInput(pageId)}
-                </div>
-                <div class="sidebar">
-                    <div class="search-history" id="history_${pageId.replace('/', '')}"></div>
-                </div>
-            </div>
-        `;
-
-        page.innerHTML = pageContent;
-        container.appendChild(page);
-    }
-
-    // 渲染搜索输入框
-    renderSearchInput(pageId) {
-        const inputId = `search_${pageId.replace('/', '')}`;
+    // 创建单页布局：左侧内容 + 右侧统一侧边栏容器
+    createPageLayout(pageId, pageData) {
+        // 侧边栏现在是一个预留容器，后续通过JS动态填充
+        // 这样可以确保列表在所有页面都是最新的
         return `
-            <div style="margin-top: 20px;">
-                <input type="text" id="${inputId}" placeholder="输入关键词..." style="width: 100%; padding: 10px; font-size: 16px;">
-                <button onclick="game.handleSearch('${pageId}', '${inputId}')" style="width: 100%; padding: 10px; margin-top: 10px;">搜索</button>
+            <div id="${pageId}" class="page page-wrapper">
+                <!-- 左侧卷轴内容区 -->
+                <div class="content-area">
+                    <button class="back-btn" onclick="game.goBack()">← 返回上一页</button>
+                    <div class="title">${pageData.title}</div>
+                    <div class="story-body">
+                        ${pageData.content}
+                    </div>
+                </div>
+
+                <!-- 右侧功能侧边栏 -->
+                <div class="sidebar" id="sidebar-${pageId.replace('/', '')}">
+                    <!-- 内容由 updateSidebar() 动态填充 -->
+                </div>
             </div>
         `;
     }
 
-    // 新增：初始化所有页面的搜索历史
-    initializeSearchHistories() {
-        // 为所有已知页面初始化空的搜索历史数组
-        Object.keys(PAGE_TITLES).forEach(page => {
-            if (!this.state.searchHistories[page]) {
-                this.state.searchHistories[page] = [];
+    // 生成侧边栏HTML
+    getSidebarHTML(pageId) {
+        const inputId = `searchInput_${pageId.replace('/', '')}`;
+        
+        // 生成已发现页面列表
+        let listHTML = '';
+        // 将Set转为Array并按发现顺序或固定顺序排序
+        // 这里简单遍历 PAGE_TITLES，只显示已发现的
+        Object.keys(PAGE_TITLES).forEach(key => {
+            if (this.state.discoveredPages.has(key) && key !== '/list') {
+                const isCurrent = key === pageId ? 'current' : '';
+                const title = PAGE_TITLES[key];
+                listHTML += `<div class="page-link ${isCurrent}" onclick="game.navigateTo('${key}')">⚓ ${title}</div>`;
             }
         });
+
+        return `
+            <div class="search-container">
+                <div class="sidebar-title">线索搜寻</div>
+                <input type="text" id="${inputId}" placeholder="输入关键词..." onkeypress="game.handleEnter(event, '${pageId}', '${inputId}')">
+                <button class="search-btn" onclick="game.handleSearch('${pageId}', '${inputId}')">搜索</button>
+            </div>
+
+            <div class="discovered-list-container">
+                <div class="sidebar-title">航海日志 (已发现)</div>
+                <div class="nav-list">
+                    ${listHTML}
+                </div>
+            </div>
+        `;
     }
 
-    // 搜索处理函数 - 确保保存历史
+    // 更新所有页面的侧边栏 (保持状态同步)
+    updateAllSidebars() {
+        // 虽然有点性能损耗，但对于轻量游戏这保证了所有页面的侧边栏都是最新的
+        Object.keys(STORY_DATA).forEach(act => {
+            Object.keys(STORY_DATA[act]).forEach(pageId => {
+                const sidebarId = `sidebar-${pageId.replace('/', '')}`;
+                const sidebarEl = document.getElementById(sidebarId);
+                if (sidebarEl) {
+                    sidebarEl.innerHTML = this.getSidebarHTML(pageId);
+                }
+            });
+        });
+        
+        // 恢复焦点 logic can be added here if needed
+    }
+
+    // 导航跳转
+    navigateTo(pageId, addToHistory = true) {
+        // 如果页面没变，不操作
+        if (this.state.currentPageId === pageId) return;
+
+        // 隐藏当前页
+        const currentEl = document.querySelector('.page.active');
+        if (currentEl) currentEl.classList.remove('active');
+
+        // 记录历史
+        if (addToHistory && this.state.currentPageId) {
+            this.state.historyStack.push(this.state.currentPageId);
+        }
+
+        // 显示新页
+        const targetEl = document.getElementById(pageId);
+        if (targetEl) {
+            targetEl.classList.add('active');
+            this.state.discoveredPages.add(pageId);
+            this.state.currentPageId = pageId;
+            
+            // 更新UI状态
+            this.updateBackButtonState(targetEl);
+            this.updateAllSidebars(); // 关键：更新侧边栏列表
+            this.setSearchPlaceholder(pageId);
+            
+            // 滚动到顶部
+            const contentArea = targetEl.querySelector('.content-area');
+            if(contentArea) contentArea.scrollTop = 0;
+        }
+    }
+
+    // 返回上一页
+    goBack() {
+        if (this.state.historyStack.length > 0) {
+            const prevPage = this.state.historyStack.pop();
+            this.navigateTo(prevPage, false); // false 表示不再次压入栈
+        }
+    }
+
+    // 更新返回按钮的显示/隐藏
+    updateBackButtonState(pageEl) {
+        const btn = pageEl.querySelector('.back-btn');
+        if (!btn) return;
+
+        if (this.state.historyStack.length === 0) {
+            btn.classList.add('hidden'); // 首页或无历史时不显示
+        } else {
+            btn.classList.remove('hidden');
+            // 获取上一页标题作为提示
+            const prevId = this.state.historyStack[this.state.historyStack.length - 1];
+            btn.innerHTML = `← 返回: ${PAGE_TITLES[prevId] || '上一页'}`;
+        }
+    }
+
+    // 处理回车搜索
+    handleEnter(event, pageId, inputId) {
+        if (event.key === 'Enter') {
+            this.handleSearch(pageId, inputId);
+        }
+    }
+
+    // 搜索逻辑
     handleSearch(currentPage, inputId) {
         const input = document.getElementById(inputId);
         if (!input) return;
@@ -95,32 +175,39 @@ class GameEngine {
         const keyword = input.value.trim().toLowerCase();
         if (!keyword) return;
 
-        // 保存搜索历史
-        this.saveSearchHistory(currentPage, keyword);
-
         const ruleSet = ROUTES.find(r => r.page === currentPage);
-        if (!ruleSet) return;
+        
+        // 特殊：如果在任意页面搜 "list"，虽然现在有了侧边栏，但为了兼容旧习惯或提示
+        if (keyword === 'list') {
+            alert('所有已发现的页面都在右侧栏显示了。');
+            input.value = '';
+            return;
+        }
 
         let targetPage = null;
         let matchedKeyword = null;
 
-        for (const rule of ruleSet.rules) {
-            for (const k of rule.keywords) {
-                if (keyword.includes(k.toLowerCase())) {
-                    targetPage = rule.target;
-                    matchedKeyword = k.toLowerCase();
-                    break;
+        if (ruleSet) {
+            for (const rule of ruleSet.rules) {
+                for (const k of rule.keywords) {
+                    if (keyword.includes(k.toLowerCase())) {
+                        targetPage = rule.target;
+                        matchedKeyword = k.toLowerCase();
+                        break;
+                    }
                 }
+                if (targetPage) break;
             }
-            if (targetPage) break;
         }
 
         if (!targetPage) {
-            alert('没有找到匹配的页面，请尝试其他关键词。');
+            // 简单的震动反馈或提示
+            input.style.borderColor = '#ff4444';
+            setTimeout(() => input.style.borderColor = '#4a5d73', 500);
             return;
         }
 
-        // 记录进入unlock页面的方式
+        // 记录进入unlock页面的方式 (逻辑保持不变)
         if (targetPage === '/unlock_destination') {
             if (matchedKeyword === 'western new world land') {
                 this.state.unlockEntryMethod = 'destination';
@@ -129,221 +216,49 @@ class GameEngine {
             }
         }
 
-        this.state.discoveredPages.add(targetPage);
-        input.value = '';
+        input.value = ''; // 清空输入框
         this.navigateTo(targetPage);
     }
 
-    // 页面跳转函数 - 确保更新搜索历史显示
-    navigateTo(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        
-        const target = document.getElementById(pageId);
-        if (target) {
-            target.classList.add('active');
-            this.state.discoveredPages.add(pageId);
-            
-            const searchInput = target.querySelector('input[type="text"]');
-            if (searchInput) {
-                // 设置placeholder逻辑
-                if (pageId === '/unlock_destination') {
-                    if (this.state.unlockEntryMethod === 'destination') {
-                        searchInput.placeholder = "输入找到即将乘坐的舰名";
-                    } else if (this.state.unlockEntryMethod === 'ship') {
-                        searchInput.placeholder = "输入找到的目的地";
-                    } else {
-                        searchInput.placeholder = "输入关键词...";
-                    }
-                } else if (pageId === '/royal_navy') {
-                    searchInput.placeholder = "输入找到即将乘坐的舰名";
-                } else {
-                    searchInput.placeholder = "输入关键词...";
-                }
-                
-                searchInput.value = '';
-                searchInput.focus();
-            }
+    // 设置特定页面的Placeholder (保持原有逻辑)
+    setSearchPlaceholder(pageId) {
+        const inputId = `searchInput_${pageId.replace('/', '')}`;
+        const input = document.getElementById(inputId);
+        if (!input) return;
 
-            // 更新解锁页面的提示文字
-            if (pageId === '/unlock_destination') {
-                this.updateUnlockInstruction();
-            }
-        }
-
-        // 确保新页面有搜索历史数组
-        if (!this.state.searchHistories[pageId]) {
-            this.state.searchHistories[pageId] = [];
-        }
-
-        // 关键：每次跳转都更新搜索历史显示
-        this.updateSearchHistories();
-        this.updateListPage();
-    }
-
-    // 搜索历史管理 - 修复保存逻辑
-    saveSearchHistory(page, keyword) {
-        // 确保页面有搜索历史数组
-        if (!this.state.searchHistories[page]) {
-            this.state.searchHistories[page] = [];
-        }
-        
-        // 移除重复的关键词（如果已存在）
-        this.state.searchHistories[page] = this.state.searchHistories[page]
-            .filter(item => item !== keyword);
-        
-        // 将新关键词添加到开头
-        this.state.searchHistories[page].unshift(keyword);
-        
-        // 限制历史记录数量
-        if (this.state.searchHistories[page].length > 10) {
-            this.state.searchHistories[page] = this.state.searchHistories[page].slice(0, 10);
-        }
-        
-        console.log(`搜索历史更新 - 页面: ${page}, 关键词: ${keyword}`);
-    }
-
-    // 更新搜索历史显示 - 修复显示逻辑
-    updateSearchHistories() {
-        // 获取当前活动页面
-        const activePage = document.querySelector('.page.active');
-        if (!activePage) return;
-        
-        const currentPageId = activePage.id;
-        const historyElement = activePage.querySelector('.search-history');
-        
-        if (historyElement && this.state.searchHistories[currentPageId]) {
-            historyElement.innerHTML = '';
-            
-            if (this.state.searchHistories[currentPageId].length === 0) {
-                // 如果没有搜索历史，显示提示
-                const emptyMsg = document.createElement('div');
-                emptyMsg.className = 'search-history-item';
-                emptyMsg.textContent = '暂无搜索历史';
-                emptyMsg.style.color = '#888';
-                emptyMsg.style.fontStyle = 'italic';
-                historyElement.appendChild(emptyMsg);
-            } else {
-                // 显示搜索历史
-                this.state.searchHistories[currentPageId].forEach(keyword => {
-                    const item = document.createElement('div');
-                    item.className = 'search-history-item';
-                    item.textContent = keyword;
-                    
-                    // 点击历史项可以快速搜索
-                    item.style.cursor = 'pointer';
-                    item.onclick = () => {
-                        const input = activePage.querySelector('input[type="text"]');
-                        if (input) {
-                            input.value = keyword;
-                            this.handleSearch(currentPageId, input.id);
-                        }
-                    };
-                    
-                    historyElement.appendChild(item);
-                });
-            }
-        }
-    }
-
-    // 更新解锁页面提示
-    updateUnlockInstruction() {
-        const instructionElement = document.getElementById('unlockInstruction');
-        if (instructionElement) {
+        if (pageId === '/unlock_destination') {
             if (this.state.unlockEntryMethod === 'destination') {
-                instructionElement.textContent = '请搜索你找到的舰船名称';
+                input.placeholder = "输入即将乘坐的舰名...";
             } else if (this.state.unlockEntryMethod === 'ship') {
-                instructionElement.textContent = '请搜索你找到的目的地';
+                input.placeholder = "输入目的地...";
             } else {
-                instructionElement.textContent = '请搜索相关信息';
+                input.placeholder = "输入关键词...";
             }
+        } else if (pageId === '/royal_navy') {
+            input.placeholder = "寻找舰船名称...";
+        } else {
+            input.placeholder = "输入关键词以探索...";
         }
     }
 
-    // 更新列表页面
-    updateListPage() {
-        const listPage = document.getElementById('/list');
-        if (!listPage) return;
-        
-        const linksContainer = document.getElementById('allPageLinks');
-        if (!linksContainer) return;
-        
-        linksContainer.innerHTML = '';
-        
-        const allPages = Object.keys(PAGE_TITLES);
-        
-        allPages.forEach(page => {
-            if (this.state.discoveredPages.has(page)) {
-                const link = document.createElement('div');
-                link.className = 'page-link';
-                link.textContent = PAGE_TITLES[page] || page;
-                link.onclick = () => this.navigateTo(page);
-                linksContainer.appendChild(link);
-            }
-        });
-    }
-
-    // 解锁功能
+    // 解锁按钮处理
     handleUnlock() {
         const input = document.getElementById('unlockInput');
         if (!input) return;
-        
         const answer = input.value.trim().toLowerCase();
         
         if (answer === 'wnwl' || answer === 'western new world land' || answer === '黑曜石号') {
             this.navigateTo('/first_mission_key');
         } else {
-            alert('答案不正确，请再想想。');
+            alert('航向似乎不对，再仔细看看线索...');
         }
     }
 
-    // 初始化事件监听
-    initEventListeners() {
-        const searchInputs = document.querySelectorAll('input[type="text"]');
-        searchInputs.forEach(input => {
-            input.addEventListener('keypress', (event) => {
-                if (event.keyCode === 13 || event.key === 'Enter') {
-                    const pageWrapper = input.closest('.page');
-                    if (pageWrapper) {
-                        const currentPage = pageWrapper.id;
-                        const inputId = input.id;
-                        this.handleSearch(currentPage, inputId);
-                    }
-                }
-            });
-        });
-
-        // 全局函数绑定
+    // 初始化全局监听
+    initGlobalListeners() {
         window.handleUnlock = () => this.handleUnlock();
-        window.navigateTo = (pageId) => this.navigateTo(pageId);
-    }
-
-    // 添加新页面（用于后续更新）
-    addNewPage(act, pageId, pageData) {
-        if (!STORY_DATA[act]) {
-            STORY_DATA[act] = {};
-        }
-        STORY_DATA[act][pageId] = pageData;
-        
-        // 重新渲染页面
-        this.renderAllPages();
-        this.initEventListeners();
-    }
-
-    // 添加新路由（用于后续更新）
-    addNewRoute(routeConfig) {
-        ROUTES.push(routeConfig);
-    }
-
-    // 添加图片支持（用于后续更新）
-    loadImage(imagePath) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = imagePath;
-        });
     }
 }
 
-// 创建全局游戏实例
-const game = new GameEngine();
+// 暴露给全局window对象
+window.game = new GameEngine();
