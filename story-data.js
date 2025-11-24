@@ -2,73 +2,73 @@
 const STORY_DATA = {
     act1: {
         '/official_draft': {
-            title: '征召信',
+            title: '皇家海务部 · 征召信',
             content: `
                 <div class="desc">
                     你是一个普通的刚毕业的航海测绘师。因为家里都是海员，从小你就听爸爸和爷爷讲在大海上航行的故事，所以你也选择进修了这个方向。<br><br>
-                    今天你收到了一封征召令：
+                   今天，一封带着蜡封的信件打破了清晨的宁静：
                 </div>
 
                 <div class="letter">
-皇家海务部 · 临时征召令（节选）
+<strong>皇家海务部 · 临时征召令（节选）
 
-候选人（登记号 ███-2A）：
+候选人（登记号 █ █ █-2A）：</strong><br><br>
 
-根据《帝国海务征召条例》第7条紧急授权，你被正式列为本次征召对象。基于你所具备的航行记录、地图绘制或数学测算能力，现责令你自本函签署之时起七十二小时内，携个人测绘工具、航行日志及相关档案至港口登记处报到，不得延误。
+根据《帝国海务征召条例》第7条紧急授权，你被正式列为本次征召对象。基于你所具备的航行记录、地图绘制或数学测算能力，现责令你自本函签署之时起七十二小时内，携个人测绘工具、航行日志及相关档案至港口登记处报到，不得延误。<br><br>
 
-本次任务涉及远洋航线作业，全程须严格遵循附录所列补给标准与海事信号制度。你及同期征召人员须无条件服从指令。
 
-附注（部分内容涂黑）：……。
+本次任务涉及远洋航线作业，全程须严格遵循附录所列补给标准与海事信号制度。你及同期征召人员须无条件服从指令。<br><br>
 
-任何申诉仅限签收当日以书面形式提交，逾期视为放弃申诉权，并接受相应处分。
 
-—— 皇家海务部
+附注（部分内容涂黑）：……。<br><br>
 
-（右下角有污渍与潦草笔迹："他们知道了……"）
+
+任何申诉仅限签收当日以书面形式提交，逾期视为放弃申诉权，并接受相应处分。<br><br>
+
+
+—— 皇家海务部<br><br>
+
+
+<span style="font-family: cursive; color: #8b0000; font-size: 14px;">（右下角有污渍与潦草笔迹："他们知道了……"）</span>
                 </div>
 
                 <div class="desc">
-                    这笔迹怎么这么像艾登的？自从上次和他说了那件事之后他就消失了，难道？立刻出发去问问他的近况，毕竟我们是海事学院的同学。<br><br>
+                    这笔迹怎么这么像<strong>艾登</strong>的？自从上次和他说了那件事之后他就消失了，难道？立刻出发去问问他的近况，毕竟我们是海事学院的同学。<br><br>
                     而且最近也没听说有什么紧急的战事或者计划，怎么会开始紧急征召我这种刚毕业的人呢？不过无所谓了，大海，我来啦！嗷！
                 </div>
 
-                <div class="desc" style="margin-top: 30px; font-weight: bold;color:#fff;text-shadow:0px 0px 10px #fff;">
-                    请在搜索框内输入你认为可以推进故事的关键词。<br>输入正确关键词可解锁新的页面并获得更多线索。<br>
-                    如果你卡住了，可以搜索关键词"list"回溯你打开过的所有页面，继续找更多的关键词。<br>
-                    建议可以准备一张纸和一支笔记录你认为重要的线索。<br>
-                    加油！<br>
+<div class="desc" style="margin-top: 30px; padding: 15px; border: 1px dashed #c4a46a; background: rgba(0,0,0,0.05); font-size: 0.9em;">
+      <strong style="color: #8b0000;">新手引导：</strong><br>
+                    1. 阅读文字，寻找加粗或可疑的关键词（如“艾登”）。<br>
+                    2. 在右侧边栏的搜索框中输入关键词。<br>
+                    3. 正确的关键词将解锁新的线索页面，并自动记录在右侧列表中。
                 </div>
             `
         },
 
         '/aiden': {
-            title: '艾登',
+            title: '艾登的住所',
             content: `
-                <div class="desc">
-                    到了艾登家门口。非常安静，完全没有人的感觉。<br><br>
-                    只能去我俩的秘密基地看一下。<br><br>
+ <div class="desc">
+                    艾登家大门紧锁，窗户上积了灰。你绕到后巷，那是你们小时候的秘密基地。<br>
+                    在一块松动的砖头下，你发现了一封残破的信：
+                </div>
+  <div class="letter">
+（纸张褶皱，字迹颤抖）<br><br>
 
-                    竟然有封信：<br>
-                    （纸张破裂，字迹颤抖）<br><br>
+我不知道你看不看得到这封信。但我没得选了。<br>
+他们逼我说出一切。昨天在码头，他们打断了我的肋骨。<br><br>
 
-                    我不知道你看不看得到这封信。事情发展到今天，我已经没得选了。<br><br>
+可那张图的一半在你那里啊！我死也不能说。<br>
+我只敢留给你四个<strong>旗号</strong>，就是我们小时候练的那种：<br><br>
 
-                    他们让我说出一切。他们说如果我不开口，就会找我母亲。昨天晚上，他们在码头拦住我，把我按倒在地。我听到自己肋骨碎裂的声音。<br><br>
+1. 蓝-白-红-白-蓝<br>
+2. 蓝-白-蓝-白-蓝-白-蓝（七横）<br>
+3. 蓝-白-红-白-蓝<br>
+4. 黄-红-黄-红-黄<br><br>
 
-                    可我真的没有完整的那张图。那是你保存的。<br><br>
-
-                    我只敢在纸上放四个"旗号"，你懂的，就是我们小时候用来练习字母的海事旗：<br><br>
-
-                    第一面：蓝-白-红-白-蓝。<br>
-                    第二面：蓝-白-蓝-白-蓝-白-蓝。七横<br>
-                    第三面：蓝-白-红-白-蓝。<br>
-                    第四面：黄-红-黄-红-黄。<br><br>
-
-                    请……请你自己看懂。若我不在了，别怪我没告诉你实情。<br><br>
-
-                    ——艾登<br><br>
-
-                    （末尾撕掉一角）<br><br>
+若我不在了，你自己保重。<br>
+——艾登
                 </div>
 
                 <div class="desc">
@@ -79,21 +79,17 @@ const STORY_DATA = {
 
         '/neighbor_testimony': {
             title: '邻居证词',
-            content: `
-                <div class="desc">
-                    邻居证词（手写）<br><br>
+ content: `
+                <div class="letter">
+<strong>邻居 L 的口述记录：</strong><br><br>
 
-                    上周有一天，我听见隔壁那孩子（艾登）的屋子传来响声。我起初以为是争吵，可很快就听到重物倒地与闷哼。<br>
+"上周晚上，隔壁那孩子屋里动静很大。我也不是没见过世面，但那声音像是骨头撞在墙上。"<br><br>
 
-                    我从门缝往外探，看见两个陌生男人押着艾登向巷外走。他们的话我听得很清楚：<br><br>
+"我从门缝偷看，两个穿黑风衣的人架着他。我听得真真的："<br>
+——'把图交出来。那玩意儿比你的命值钱。'<br>
+——'你欠的不是钱，是命。'<br><br>
 
-                    "你欠的不是钱，是命。"<br><br>
-
-                    "把图交出来。那玩意儿比你命值钱。"<br><br>
-
-                    艾登说他没有，他们就掐着他脖子往墙上撞。我想报警，可那两个家伙盯了我一眼，我就不敢动了。<br><br>
-
-                    ——邻居 L<br><br>
+"那两个人在找一张<strong>旧航图</strong>。我不敢报警，那眼神太吓人了。"
                 </div>
             `
         },
@@ -105,6 +101,8 @@ const STORY_DATA = {
                     旧航图碎片描述<br><br>
 
                     碎片边缘呈烧焦形状。可辨识信息如下：<br><br>
+</div>
+  <div class="letter" style="background: #fff8e1;">
 
                     一：经度线旁褪色的墨迹写着"71°0X′"，纬度被海水溅得模糊。<br>
                     I. <span style="font-weight: bold;">Western</span> meridian fades at "71°0X′", salt-mist erasing its parallel.<br><br>
@@ -198,33 +196,33 @@ const STORY_DATA = {
         '/royal_navy': {
             title: '皇家海务部',
             content: `
-                <div class="desc">
-                    远征舰队登记简表（节选）<br><br>
+              <div class="letter">
+<strong>远征舰队登记简表（绝密）</strong><br><br>
 
-                    舰名：黑曜石号（Obsidian）<br>
-                    指挥官：阿尔契巴尔德·温斯洛<br>
-                    水手长：威廉·哈克特<br>
-                    随行稽查官：西奥多西奥·里贝拉<br>
-                    船员若干：皮埃尔-马里·杜邦、埃德加·普劳德、路易吉·康塔里尼、卡斯帕·索伦森……<br><br>
-
-                    备注：本次远征目的暂不公开。所有补给与航图由皇家学者审查后封存。<br><br>
+舰名：<strong>黑曜石号</strong>（Obsidian）<br>
+指挥官：阿尔契巴尔德·温斯洛<br>
+状态：即将起航<br>
+备注：本次远征目的地已被加密。关键词为 Western New World Land (WNWL)。
                 </div>
             `
         },
 
         '/unlock_destination': {
-            title: '真相浮现',
+            title: '真相的拼图',
             content: `
                 <div class="desc">
-                    现在我明白了，我似乎因为爷爷的那个航图被卷入了一趟不得不出发的航程。
+                    线索已经齐备。<br>
+                    艾登的旗语 (WNWL)，旧航图的首字母，以及那艘神秘的舰船。<br>
+                    命运的齿轮已经开始转动。
                 </div>
                 
                 <div class="unlock-section">
                     <div id="unlock-instruction">
-                        <p style="color: #c4a46a; margin-bottom: 15px;">请输入完整的目的地或舰船名称来继续。</p>
+                        <p style="color: #8b0000; font-weight:bold;">请输入最终的答案以开启航程。</p>
+                        <p style="font-size: 0.9em;">(提示：输入缩写 WNWL，或全称，或舰船名)</p>
                     </div>
-                    <input type="text" id="unlockInput" placeholder="">
-                    <button onclick="handleUnlock()" id="unlockButton">开启航程</button>
+                    <input type="text" id="unlockInput" placeholder="输入答案...">
+                    <button id="unlockButton" onclick="window.game.handleUnlock()">开启航程</button>
                 </div>
             `
         },
@@ -249,25 +247,13 @@ const STORY_DATA = {
 
                 <div style="text-align: center; margin-top: 30px;">
                     <button onclick="navigateTo('/ch2_intro')" class="second-act-btn">
-                        第二幕
+                        进入第二幕
                     </button>
                 </div>
             `
         },
 
-        '/list': {
-            title: '已发现页面列表',
-            content: `
-                <div class="desc">
-                    以下是你在探索过程中发现的所有页面。点击页面名称可以快速跳转。
-                </div>
-                
-                <div id="allPageLinks" style="margin-top: 20px;">
-                    <!-- 动态生成页面链接 -->
-                </div>
-            `
-        }
-    },
+
 
     act2: {
         '/ch2_intro': {
