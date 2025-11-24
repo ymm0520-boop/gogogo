@@ -260,6 +260,7 @@ const STORY_DATA = {
             title: '第二幕 · 登船',
             content: `
     <!-- 信纸样式的内容 -->
+ <div class="desc">
         <div class="parchment-paper">
             <div class="ink-blot ink-blot-1"></div>
             <div class="ink-blot ink-blot-2"></div>
@@ -280,13 +281,15 @@ const STORY_DATA = {
 阿尔契巴尔德·温斯洛最后踏上 “圣玛丽亚” 号的踏板。这位红头发、蓝眼睛的欧洲人穿着褪色的航海服，靴底还沾着码头的泥沙。他回头望了一眼岸上寥寥几位送行的渔夫，又低头摸了摸怀中的航海图，那上面用红笔标注着想象中 “新大陆” 的轮廓。晨雾渐散，第一缕阳光照在船帆上，船员们纷纷拉起绳索，帆布在风中展开，发出猎猎声响。稽查官走到指挥官温斯洛身边，举起王室委任状再次确认：“航海司令，一切就绪。” 船长点点头，目光投向雾色渐开的海平面，声音低沉却坚定：“我们即将驶向未知的海洋，去寻找通往新大陆的航线，为王室带回财富与荣耀！” 船员们纷纷停下手中的活，目光集中在他身上，有兴奋，有紧张，也有不安。
                 </div>
  </div>
+ </div>
             `
         },
 
         '/ch2_captain': {
             title: '温斯洛日记',
             content: `
-                <div class="letter">
+ <div class="desc">                
+<div class="letter">
 8月2日<br><br>
 
 皇家海务部的命令来得突然，要求我立即接手"黑曜石号"的指挥权。<br><br>
@@ -298,13 +301,16 @@ const STORY_DATA = {
 我们必须找到那个地方，在其他人之前。那张图上标记的位置……如果传说是真的……<br><br>
 
 （墨迹在此处晕开）
-                </div>
+               
+ </div> 
+</div>
             `
         },
 
         '/ch2_inspector': {
             title: '里贝拉稽查记录',
             content: `
+ <div class="desc">
                 <div class="letter">
 稽查官日志 · 机密<br><br>
 
@@ -321,12 +327,14 @@ const STORY_DATA = {
 
 ——里贝拉
                 </div>
+</div>
             `
         },
 
         '/ch2_dubang': {
             title: '杜邦兄弟对话片段',
             content: `
+ <div class="desc">
                 <div class="letter">
 （深夜，货舱角落）<br><br>
 
@@ -342,6 +350,7 @@ const STORY_DATA = {
 
 （脚步声接近，对话中止）
                 </div>
+</div>
             `
         }
     }

@@ -261,14 +261,14 @@ class GameEngine {
             }
         } else if (this.state.unlockEntryMethod === 'ship') {
             // 状态是“已找到船名”，所以必须输入目的地
-            if (answer === 'wnwl' || answer === 'western new world land') {
+            if (answer === 'wnwl' || answer === 'Western New World Land') {
                 isCorrect = true;
             } else {
-                alert("不对。既然你知道了船名，那这艘船要开往哪里？\n提示：看看艾登留下的旗语。");
+                alert("不对。既然你知道了船名，那这艘船要开往哪里？\n提示：看看艾登留下的旗语或旧航图。");
             }
         } else {
             // 容错：如果状态丢失，允许任意一个答案（或阻止）
-            if (answer === 'wnwl' || answer === '黑曜石号') {
+            if (answer === 'wnwl' || answer === '黑曜石号' || answer === 'Western New World Land') {
                 isCorrect = true;
             }
         }
