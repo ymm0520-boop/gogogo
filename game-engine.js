@@ -3,7 +3,7 @@
 class GameEngine {
     constructor() {
         this.state = {
-            unlockEntryMethod: null, // 'destination' or 'ship'
+            unlockEntryMethod: null, // 'destination' (先找到目的地) or 'ship' (先找到船)
             discoveredPages: new Set(['/official_draft']),
             historyStack: [], // 导航历史栈
             currentAct: 'act1',
@@ -16,10 +16,10 @@ class GameEngine {
         this.renderAllPages();
         this.initGlobalListeners();
         this.navigateTo('/official_draft', false); // 初始加载不记入历史栈
-        console.log('航海冒险游戏初始化完成 - v2.0 Medieval');
+        console.log('航海冒险游戏初始化完成 - v2.1 Logic Fix');
     }
 
-    // 渲染所有页面结构 (现在分为左侧内容和右侧侧边栏)
+    // 渲染所有页面结构
     renderAllPages() {
         const app = document.getElementById('app');
         let html = '';
@@ -31,13 +31,11 @@ class GameEngine {
         });
 
         app.innerHTML = html;
-        this.updateAllSidebars(); // 初始渲染侧边栏
+        this.updateAllSidebars();
     }
 
-    // 创建单页布局：左侧内容 + 右侧统一侧边栏容器
+    // 创建单页布局
     createPageLayout(pageId, pageData) {
-        // 侧边栏现在是一个预留容器，后续通过JS动态填充
-        // 这样可以确保列表在所有页面都是最新的
         return `
             <div id="${pageId}" class="page page-wrapper">
                 <!-- 左侧卷轴内容区 -->
@@ -61,10 +59,7 @@ class GameEngine {
     getSidebarHTML(pageId) {
         const inputId = `searchInput_${pageId.replace('/', '')}`;
         
-        // 生成已发现页面列表
         let listHTML = '';
-        // 将Set转为Array并按发现顺序或固定顺序排序
-        // 这里简单遍历 PAGE_TITLES，只显示已发现的
         Object.keys(PAGE_TITLES).forEach(key => {
             if (this.state.discoveredPages.has(key) && key !== '/list') {
                 const isCurrent = key === pageId ? 'current' : '';
@@ -89,9 +84,8 @@ class GameEngine {
         `;
     }
 
-    // 更新所有页面的侧边栏 (保持状态同步)
+    // 更新所有页面的侧边栏
     updateAllSidebars() {
-        // 虽然有点性能损耗，但对于轻量游戏这保证了所有页面的侧边栏都是最新的
         Object.keys(STORY_DATA).forEach(act => {
             Object.keys(STORY_DATA[act]).forEach(pageId => {
                 const sidebarId = `sidebar-${pageId.replace('/', '')}`;
@@ -101,13 +95,10 @@ class GameEngine {
                 }
             });
         });
-        
-        // 恢复焦点 logic can be added here if needed
     }
 
     // 导航跳转
     navigateTo(pageId, addToHistory = true) {
-        // 如果页面没变，不操作
         if (this.state.currentPageId === pageId) return;
 
         // 隐藏当前页
@@ -128,12 +119,37 @@ class GameEngine {
             
             // 更新UI状态
             this.updateBackButtonState(targetEl);
-            this.updateAllSidebars(); // 关键：更新侧边栏列表
-            this.setSearchPlaceholder(pageId);
+            this.updateAllSidebars(); 
+            this.setSearchPlaceholder(pageId); // 设置侧边栏 placeholder
             
+            // 【关键修复】如果是解锁页，专门更新正文区域的输入框 UI
+            if (pageId === '/unlock_destination') {
+                this.updateUnlockPageUI();
+            }
+
             // 滚动到顶部
             const contentArea = targetEl.querySelector('.content-area');
             if(contentArea) contentArea.scrollTop = 0;
+        }
+    }
+
+    // 【新增】更新解锁页面的UI逻辑
+    updateUnlockPageUI() {
+        const unlockInput = document.getElementById('unlockInput');
+        if (!unlockInput) return;
+
+        // 清空之前可能输入的内容
+        unlockInput.value = '';
+
+        if (this.state.unlockEntryMethod === 'destination') {
+            // 用户已经搜到了目的地，现在需要搜船名
+            unlockInput.placeholder = "输入找到即将乘坐的舰名";
+        } else if (this.state.unlockEntryMethod === 'ship') {
+            // 用户已经搜到了船名，现在需要搜目的地
+            unlockInput.placeholder = "输入找到的目的地";
+        } else {
+            // 异常情况或直接跳转
+            unlockInput.placeholder = "请输入缺失的线索";
         }
     }
 
@@ -141,26 +157,22 @@ class GameEngine {
     goBack() {
         if (this.state.historyStack.length > 0) {
             const prevPage = this.state.historyStack.pop();
-            this.navigateTo(prevPage, false); // false 表示不再次压入栈
+            this.navigateTo(prevPage, false);
         }
     }
 
-    // 更新返回按钮的显示/隐藏
     updateBackButtonState(pageEl) {
         const btn = pageEl.querySelector('.back-btn');
         if (!btn) return;
-
         if (this.state.historyStack.length === 0) {
-            btn.classList.add('hidden'); // 首页或无历史时不显示
+            btn.classList.add('hidden');
         } else {
             btn.classList.remove('hidden');
-            // 获取上一页标题作为提示
             const prevId = this.state.historyStack[this.state.historyStack.length - 1];
             btn.innerHTML = `← 返回: ${PAGE_TITLES[prevId] || '上一页'}`;
         }
     }
 
-    // 处理回车搜索
     handleEnter(event, pageId, inputId) {
         if (event.key === 'Enter') {
             this.handleSearch(pageId, inputId);
@@ -175,15 +187,13 @@ class GameEngine {
         const keyword = input.value.trim().toLowerCase();
         if (!keyword) return;
 
-        const ruleSet = ROUTES.find(r => r.page === currentPage);
-        
-        // 特殊：如果在任意页面搜 "list"，虽然现在有了侧边栏，但为了兼容旧习惯或提示
         if (keyword === 'list') {
             alert('所有已发现的页面都在右侧栏显示了。');
             input.value = '';
             return;
         }
 
+        const ruleSet = ROUTES.find(r => r.page === currentPage);
         let targetPage = null;
         let matchedKeyword = null;
 
@@ -201,61 +211,76 @@ class GameEngine {
         }
 
         if (!targetPage) {
-            // 简单的震动反馈或提示
             input.style.borderColor = '#ff4444';
             setTimeout(() => input.style.borderColor = '#4a5d73', 500);
             return;
         }
 
-        // 记录进入unlock页面的方式 (逻辑保持不变)
+        // 记录进入unlock页面的方式
         if (targetPage === '/unlock_destination') {
-            if (matchedKeyword === 'western new world land') {
-                this.state.unlockEntryMethod = 'destination';
-            } else if (matchedKeyword === '黑曜石号') {
-                this.state.unlockEntryMethod = 'ship';
+            // 注意：这里检查的是“用户输入了什么”来触发的跳转
+            if (matchedKeyword === 'western new world land' || matchedKeyword === 'wnwl') {
+                this.state.unlockEntryMethod = 'destination'; // 意味着他找到了目的地，缺船名
+            } else if (matchedKeyword === '黑曜石号' || matchedKeyword === '黑曜石' || matchedKeyword === 'obsidian') {
+                this.state.unlockEntryMethod = 'ship'; // 意味着他找到了船名，缺目的地
             }
         }
 
-        input.value = ''; // 清空输入框
+        input.value = ''; 
         this.navigateTo(targetPage);
     }
 
-    // 设置特定页面的Placeholder (保持原有逻辑)
     setSearchPlaceholder(pageId) {
+        // 这个方法现在只控制右侧边栏的 placeholder，不再控制正文输入框
         const inputId = `searchInput_${pageId.replace('/', '')}`;
         const input = document.getElementById(inputId);
         if (!input) return;
 
-        if (pageId === '/unlock_destination') {
-            if (this.state.unlockEntryMethod === 'destination') {
-                input.placeholder = "输入即将乘坐的舰名...";
-            } else if (this.state.unlockEntryMethod === 'ship') {
-                input.placeholder = "输入目的地...";
-            } else {
-                input.placeholder = "输入关键词...";
-            }
-        } else if (pageId === '/royal_navy') {
+        if (pageId === '/royal_navy') {
             input.placeholder = "寻找舰船名称...";
         } else {
             input.placeholder = "输入关键词以探索...";
         }
     }
 
-    // 解锁按钮处理
+    // 【核心修复】解锁按钮逻辑
     handleUnlock() {
         const input = document.getElementById('unlockInput');
         if (!input) return;
         const answer = input.value.trim().toLowerCase();
         
-        if (answer === 'wnwl' || answer === 'western new world land' || answer === '黑曜石号') {
-            this.navigateTo('/first_mission_key');
+        let isCorrect = false;
+
+        // 逻辑：互斥检查
+        if (this.state.unlockEntryMethod === 'destination') {
+            // 状态是“已找到目的地”，所以必须输入船名
+            if (answer === '黑曜石号' || answer === 'obsidian') {
+                isCorrect = true;
+            } else {
+                alert("不对。既然你知道了目的地，那我们该坐哪艘船去呢？\n提示：去档案室找找。");
+            }
+        } else if (this.state.unlockEntryMethod === 'ship') {
+            // 状态是“已找到船名”，所以必须输入目的地
+            if (answer === 'wnwl' || answer === 'western new world land') {
+                isCorrect = true;
+            } else {
+                alert("不对。既然你知道了船名，那这艘船要开往哪里？\n提示：看看艾登留下的旗语。");
+            }
         } else {
-            alert('航向似乎不对，再仔细看看线索...');
+            // 容错：如果状态丢失，允许任意一个答案（或阻止）
+            if (answer === 'wnwl' || answer === '黑曜石号') {
+                isCorrect = true;
+            }
+        }
+        
+        if (isCorrect) {
+            this.navigateTo('/first_mission_key');
         }
     }
 
-    // 初始化全局监听
     initGlobalListeners() {
+        // 确保 HTML 中的 onclick 能调用到这些方法
+        window.game = this; 
         window.handleUnlock = () => this.handleUnlock();
     }
 }

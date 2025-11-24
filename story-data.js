@@ -207,21 +207,20 @@ const STORY_DATA = {
             `
         },
 
-        '/unlock_destination': {
+ '/unlock_destination': {
             title: '真相的拼图',
             content: `
                 <div class="desc">
-                    线索还待齐备。<br>
-
-                    命运的齿轮已经开始转动。
+                    线索已拼凑出一半。<br>
+                    命运的齿轮已经开始转动，你还需要找到这趟旅程的另一半关键信息。
                 </div>
                 
                 <div class="unlock-section">
                     <div id="unlock-instruction">
-                        <p style="color: #8b0000; font-weight:bold;">请输入最终的答案以开启航程。</p>
-                        <p style="font-size: 0.9em;">(提示：输入目的地或舰船名)</p>
+                        <p style="color: #8b0000; font-weight:bold;">请输入缺少的关键信息以开启航程。</p>
                     </div>
-                    <input type="text" id="unlockInput" placeholder="输入答案...">
+                    <!-- 注意：placeholder 将由 JS 动态控制 -->
+                    <input type="text" id="unlockInput" placeholder="">
                     <button id="unlockButton" onclick="window.game.handleUnlock()">开启航程</button>
                 </div>
             `
@@ -235,9 +234,9 @@ const STORY_DATA = {
 
                     你已成功拼合散落在文件、日记、证词与旗语中的所有线索。<br><br>
 
-                    ——目的地已显现。<br>
-                    ——远征队航向已不可逆转。<br>
-                    ——你将在下一幕登上"黑曜石号"。
+                    ——目的地：Western New World Land<br>
+                    ——舰船：黑曜石号<br><br>
+                    远征队航向已不可逆转。
                 </div>
                 
                 <div class="desc">
@@ -246,7 +245,8 @@ const STORY_DATA = {
                 </div>
 
                 <div style="text-align: center; margin-top: 30px;">
-                    <button onclick="navigateTo('/ch2_intro')" class="second-act-btn">
+                    <!-- 修复：这里改为调用 window.game.navigateTo -->
+                    <button onclick="window.game.navigateTo('/ch2_intro')" class="second-act-btn">
                         进入第二幕
                     </button>
                 </div>
